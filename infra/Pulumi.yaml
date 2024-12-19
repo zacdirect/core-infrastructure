@@ -1,0 +1,8 @@
+name: core-infrastructure
+description: Sets up the necessary authentication between Azure, GitHub, and Pulumi Cloud
+runtime:
+  name: nodejs
+  options:
+    packagemanager: npm
+config:
+  azure-native:location: CentralUS

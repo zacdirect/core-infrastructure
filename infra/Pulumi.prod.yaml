@@ -1,0 +1,6 @@
+config:
+  core-infrastructure:appName: zacdirect
+  core-infrastructure:azureSubscriptionId:
+    secure: AAABAINS9oXplNHexTEEgLYkG6tZRezNvQpszTE6+SG4yLj/wFCeKRPHPs3fzU1ZfTLE9ej7OEYmJD7TrnrkEDrXuFE=
+  core-infrastructure:gitHubRepos:
+    - zac.direct
