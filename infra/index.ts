@@ -26,25 +26,26 @@ const servicePrincipal = new azuread.ServicePrincipal(`${appName}-service-princi
 // Add federated credentials to the application.
 // https://www.pulumi.com/docs/pulumi-cloud/access-management/oidc/provider/azure/#add-federated-credentials
 const escCredential = new azuread.ApplicationFederatedIdentityCredential(`${appName}-pulumi-esc-cred`, {
-    applicationId: pulumiEscApp.objectId,
-    displayName: `${toTitleCase(appName)} OIDC for Pulumi ESC`,
+    applicationId: pulumiEscApp.id,
+    displayName: `${appName}-pulumi-esc-cred`,
     audiences: [`azure:${pulumiOrgName}` ],
     issuer: "https://api.pulumi.com/oidc",
     subject: `pulumi:environments:org:${pulumiOrgName}:env:${escProjectName}/${environmentName}`,
-    description: `Federated credential for Pulumi ESC`,
+    description: `${toTitleCase(appName)} OIDC for Pulumi ESC`,
 });
 
-new service.Environment(`${appName}-pulumi-esc-${escProjectName}`, {
-    organization: pulumiOrgName,
-    project: escProjectName,
-    name: environmentName,
-    yaml: new pulumi.asset.StringAsset(
+current.then(current => {
+    new service.Environment(`${appName}-esc`, {
+        organization: pulumiOrgName,
+        project: escProjectName,
+        name: environmentName,
+        yaml: new pulumi.asset.StringAsset(
 `values:
   azure:
     login:
       fn::open::azure-login:
-        clientId: ${current.then(current => current.clientId)}
-        tenantId: ${current.then(current => current.tenantId)}
+        clientId: ${current.clientId}
+        tenantId: ${current.tenantId}
         subscriptionId: ${azureSubscriptionId}
         oidc: true
         subjectAttributes:
@@ -55,8 +56,9 @@ new service.Environment(`${appName}-pulumi-esc-${escProjectName}`, {
     ARM_CLIENT_ID: \${azure.login.clientId}
     ARM_TENANT_ID: \${azure.login.tenantId}
     ARM_OIDC_TOKEN: \${azure.login.oidc.token}
-    ARM_SUBSCRIPTION_ID: \${azure.login.subscriptionId}`
-    )
+    ARM_SUBSCRIPTION_ID: \${azure.login.subscriptionId}`)
+    });
+    
 });
 
 // Export the application ID and service principal ID
